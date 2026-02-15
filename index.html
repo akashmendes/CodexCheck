@@ -263,18 +263,55 @@
 
     let index = 0;
 
-    function moveButtonSmoothly() {
-      const rect = noBtn.getBoundingClientRect();
-      const maxX = window.innerWidth - rect.width - 20;
-      const maxY = window.innerHeight - rect.height - 20;
+    const VIEWPORT_PADDING = 12;
 
-      const randomX = Math.random() * Math.max(maxX, 40);
-      const randomY = Math.random() * Math.max(maxY, 40);
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+
+    function getButtonBounds() {
+      const width = noBtn.offsetWidth;
+      const height = noBtn.offsetHeight;
+      const minX = VIEWPORT_PADDING;
+      const minY = VIEWPORT_PADDING;
+      const maxX = window.innerWidth - width - VIEWPORT_PADDING;
+      const maxY = window.innerHeight - height - VIEWPORT_PADDING;
+
+      return {
+        minX,
+        minY,
+        maxX,
+        maxY,
+        width,
+        height
+      };
+    }
+
+    function keepNoButtonInViewport() {
+      const { minX, minY, maxX, maxY } = getButtonBounds();
+      const currentLeft = Number.parseFloat(noBtn.style.left);
+      const currentTop = Number.parseFloat(noBtn.style.top);
+      const fallbackLeft = clamp(window.innerWidth * 0.5, minX, Math.max(minX, maxX));
+      const fallbackTop = clamp(window.innerHeight * 0.6, minY, Math.max(minY, maxY));
+      const safeLeft = clamp(Number.isFinite(currentLeft) ? currentLeft : fallbackLeft, minX, Math.max(minX, maxX));
+      const safeTop = clamp(Number.isFinite(currentTop) ? currentTop : fallbackTop, minY, Math.max(minY, maxY));
+
+      noBtn.style.position = 'fixed';
+      noBtn.style.left = `${safeLeft}px`;
+      noBtn.style.top = `${safeTop}px`;
+    }
+
+    function moveButtonSmoothly() {
+      const { minX, minY, maxX, maxY } = getButtonBounds();
+      const safeMaxX = Math.max(minX, maxX);
+      const safeMaxY = Math.max(minY, maxY);
+      const randomX = minX + Math.random() * (safeMaxX - minX);
+      const randomY = minY + Math.random() * (safeMaxY - minY);
 
       noBtn.style.position = 'fixed';
       noBtn.style.left = `${randomX}px`;
       noBtn.style.top = `${randomY}px`;
-      noBtn.style.transform = `rotate(${Math.random() * 10 - 5}deg)`;
+      noBtn.style.transform = `rotate(${Math.random() * 8 - 4}deg)`;
     }
 
     function changeText() {
@@ -309,14 +346,16 @@
 
     noBtn.addEventListener('mouseenter', () => {
       changeText();
-      moveButtonSmoothly();
+      requestAnimationFrame(moveButtonSmoothly);
     });
 
     noBtn.addEventListener('touchstart', (e) => {
       e.preventDefault();
       changeText();
-      moveButtonSmoothly();
+      requestAnimationFrame(moveButtonSmoothly);
     }, { passive: false });
+
+    window.addEventListener('resize', keepNoButtonInViewport);
 
     yesBtn.addEventListener('click', celebrate);
   </script>
