@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Be My Valentine?</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --rose-900: #881337;
+      --rose-700: #be123c;
+      --rose-500: #f43f5e;
+      --rose-200: #fecdd3;
+      --pink-100: #ffe4ef;
+      --card: rgba(255, 255, 255, 0.62);
+      --text-soft: #9f1239;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: var(--rose-900);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background:
+        radial-gradient(1000px 500px at 10% 0%, rgba(255, 255, 255, 0.7), transparent 60%),
+        radial-gradient(700px 400px at 90% 100%, #fda4af, transparent 70%),
+        linear-gradient(155deg, #fff1f5 0%, #fbcfe8 45%, #f9a8d4 100%);
+      position: relative;
+      isolation: isolate;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(30px);
+      opacity: 0.5;
+      z-index: -1;
+      animation: drift 12s ease-in-out infinite;
+    }
+
+    body::before {
+      width: 260px;
+      height: 260px;
+      top: 8%;
+      left: 12%;
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    body::after {
+      width: 320px;
+      height: 320px;
+      right: 10%;
+      bottom: 4%;
+      background: rgba(244, 63, 94, 0.2);
+      animation-delay: -4s;
+    }
+
+    .card {
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      width: min(92vw, 640px);
+      padding: clamp(2rem, 5vw, 3.8rem);
+      border-radius: 28px;
+      box-shadow:
+        0 24px 50px rgba(136, 19, 55, 0.14),
+        inset 0 1px 0 rgba(255, 255, 255, 0.7);
+      text-align: center;
+      animation: riseIn 650ms cubic-bezier(.2,.7,.2,1);
+    }
+
+    h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      line-height: 1.12;
+      margin: 0 0 2rem;
+      letter-spacing: -0.02em;
+      color: var(--rose-900);
+      text-wrap: balance;
+    }
+
+    .button-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.9rem;
+      flex-wrap: wrap;
+      min-height: 62px;
+    }
+
+    button {
+      padding: 0.85rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      transition: transform 220ms ease, box-shadow 220ms ease, background-color 220ms ease, color 220ms ease;
+      min-width: 128px;
+      touch-action: manipulation;
+      will-change: transform;
+    }
+
+    #yes {
+      background: linear-gradient(180deg, #e11d48, var(--rose-700));
+      color: #fff;
+      box-shadow:
+        0 10px 24px rgba(190, 18, 60, 0.35),
+        0 2px 0 rgba(255, 255, 255, 0.25) inset;
+    }
+
+    #yes:hover,
+    #yes:focus-visible {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 14px 30px rgba(190, 18, 60, 0.42);
+      outline: none;
+    }
+
+    #no {
+      background: rgba(255, 255, 255, 0.86);
+      color: var(--rose-900);
+      border: 1px solid rgba(136, 19, 55, 0.2);
+      box-shadow: 0 8px 20px rgba(136, 19, 55, 0.08);
+      z-index: 20;
+      transition:
+        left 0.36s cubic-bezier(.2,.8,.2,1),
+        top 0.36s cubic-bezier(.2,.8,.2,1),
+        transform 0.36s cubic-bezier(.2,.8,.2,1),
+        box-shadow 220ms ease;
+    }
+
+    #no:hover,
+    #no:focus-visible {
+      box-shadow: 0 12px 24px rgba(136, 19, 55, 0.14);
+      outline: none;
+    }
+
+    .hint {
+      margin-top: 1.1rem;
+      color: var(--text-soft);
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    .celebration {
+      animation: popIn 420ms ease;
+    }
+
+    .celebration h1 {
+      margin-bottom: 0.5rem;
+    }
+
+    .celebration p {
+      margin: 0;
+      font-size: 1.08rem;
+      color: var(--rose-900);
+      opacity: 0.9;
+    }
+
+    .hearts {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 5;
+    }
+
+    .heart {
+      position: absolute;
+      bottom: -40px;
+      font-size: clamp(14px, 2.2vw, 28px);
+      animation: floatUp linear forwards;
+      opacity: 0.85;
+      filter: drop-shadow(0 4px 8px rgba(190, 18, 60, 0.28));
+    }
+
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(14px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes drift {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(18px, -14px); }
+    }
+
+    @keyframes floatUp {
+      from { transform: translateY(0) translateX(0) rotate(0); opacity: 0; }
+      15% { opacity: 0.95; }
+      to { transform: translateY(-115vh) translateX(var(--x-drift)) rotate(var(--spin)); opacity: 0; }
+    }
+
+    @media (max-width: 520px) {
+      .card {
+        border-radius: 22px;
+      }
+
+      button {
+        min-width: 120px;
+      }
+
+      .hint {
+        font-size: 0.88rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card" id="card">
+    <h1>Will you be my Valentine? 💌</h1>
+
+    <div class="button-row">
+      <button id="yes" aria-label="Yes">Yes 💖</button>
+      <button id="no" aria-label="No">No 😏</button>
+    </div>
+
+    <p class="hint">(Tip: one of these buttons has commitment issues.)</p>
+  </div>
+
+  <script>
+    const noBtn = document.getElementById('no');
+    const yesBtn = document.getElementById('yes');
+
+    const sassyLines = [
+      'No? 😏',
+      'Oh really? 👀',
+      'Be serious now 😌',
+      'You thought that would work? 💭',
+      'Don’t act shy 💕',
+      'We both know the answer 😌',
+      'That button isn’t for you 😉',
+      'Nice try though 🫶',
+      'You’re adorable when you try 💖',
+      'Stop playing 😏',
+      'I’ll wait… 😌',
+      'Go ahead, press Yes 💕',
+      'You’re not fooling anyone 😌',
+      'Confidence looks good on you 😉',
+      'Just say yes already 💘'
+    ];
+
+    let index = 0;
+
+    const VIEWPORT_PADDING = 12;
+
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+
+    function getButtonBounds() {
+      const width = noBtn.offsetWidth;
+      const height = noBtn.offsetHeight;
+      const minX = VIEWPORT_PADDING;
+      const minY = VIEWPORT_PADDING;
+      const maxX = window.innerWidth - width - VIEWPORT_PADDING;
+      const maxY = window.innerHeight - height - VIEWPORT_PADDING;
+
+      return {
+        minX,
+        minY,
+        maxX,
+        maxY,
+        width,
+        height
+      };
+    }
+
+    function keepNoButtonInViewport() {
+      const { minX, minY, maxX, maxY } = getButtonBounds();
+      const currentLeft = Number.parseFloat(noBtn.style.left);
+      const currentTop = Number.parseFloat(noBtn.style.top);
+      const fallbackLeft = clamp(window.innerWidth * 0.5, minX, Math.max(minX, maxX));
+      const fallbackTop = clamp(window.innerHeight * 0.6, minY, Math.max(minY, maxY));
+      const safeLeft = clamp(Number.isFinite(currentLeft) ? currentLeft : fallbackLeft, minX, Math.max(minX, maxX));
+      const safeTop = clamp(Number.isFinite(currentTop) ? currentTop : fallbackTop, minY, Math.max(minY, maxY));
+
+      noBtn.style.position = 'fixed';
+      noBtn.style.left = `${safeLeft}px`;
+      noBtn.style.top = `${safeTop}px`;
+    }
+
+    function moveButtonSmoothly() {
+      const { minX, minY, maxX, maxY } = getButtonBounds();
+      const safeMaxX = Math.max(minX, maxX);
+      const safeMaxY = Math.max(minY, maxY);
+      const randomX = minX + Math.random() * (safeMaxX - minX);
+      const randomY = minY + Math.random() * (safeMaxY - minY);
+
+      noBtn.style.position = 'fixed';
+      noBtn.style.left = `${randomX}px`;
+      noBtn.style.top = `${randomY}px`;
+      noBtn.style.transform = `rotate(${Math.random() * 8 - 4}deg)`;
+    }
+
+    function changeText() {
+      noBtn.textContent = sassyLines[index];
+      index = (index + 1) % sassyLines.length;
+    }
+
+    function celebrate() {
+      document.body.innerHTML = `
+        <div class="card celebration">
+          <h1>Knew it. 💖</h1>
+          <p>Best decision you’ve made all day 😌</p>
+        </div>
+        <div class="hearts" id="hearts"></div>
+      `;
+
+      const hearts = document.getElementById('hearts');
+      const icons = ['💖', '💘', '💕', '💗', '💓'];
+
+      for (let i = 0; i < 30; i += 1) {
+        const heart = document.createElement('span');
+        heart.className = 'heart';
+        heart.textContent = icons[Math.floor(Math.random() * icons.length)];
+        heart.style.left = `${Math.random() * 100}%`;
+        heart.style.animationDuration = `${4 + Math.random() * 3}s`;
+        heart.style.animationDelay = `${Math.random() * 1.5}s`;
+        heart.style.setProperty('--x-drift', `${Math.random() * 80 - 40}px`);
+        heart.style.setProperty('--spin', `${Math.random() * 50 - 25}deg`);
+        hearts.appendChild(heart);
+      }
+    }
+
+    noBtn.addEventListener('mouseenter', () => {
+      changeText();
+      requestAnimationFrame(moveButtonSmoothly);
+    });
+
+    noBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      changeText();
+      requestAnimationFrame(moveButtonSmoothly);
+    }, { passive: false });
+
+    window.addEventListener('resize', keepNoButtonInViewport);
+    keepNoButtonInViewport();
+
+    yesBtn.addEventListener('click', celebrate);
+  </script>
+</body>
+</html>
